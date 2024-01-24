@@ -1,49 +1,47 @@
 import requests
-import utils
 
 
-def fetch_commits(repo_id, author, n_days, token):
+def fetch_commits(repo_id, branch, since_date, token, all_commits=True, per_page=100):
     """
-    Fetch commits from a GitLab repository filtered by author and date.
+    Fetch all commits from a GitLab repository within a date range, across all pages.
 
     Parameters:
     repo_id (str): The ID of the GitLab repository.
-    author (str): The username of the author of the commits.
-    n_days (int): The number of days in the past to retrieve commits from.
+    branch (str): The branch to fetch commits from.
+    since_date (str): The start date for fetching commits (ISO 8601 format).
+    until_date (str): The end date for fetching commits (ISO 8601 format).
     token (str): GitLab personal access token.
+    all_commits (bool): Fetch all commits if True. Defaults to True.
+    per_page (int): Number of commits per page. Defaults to 100.
 
     Returns:
-    list: A list of commits.
+    list: A list of all commits within the date range.
     """
-    # Use the n_days_ago function from utils to calculate the since date
-    since_date = utils.n_days_ago(n_days)
+    all_commits_list = []
+    page = 1
+    while True:
+        url = f"https://gitlab.com/api/v4/projects/{repo_id}/repository/commits"
+        headers = {'Authorization': f'Bearer {token}'}
+        params = {
+            'ref_name': branch,
+            'since': since_date,
+            'all': all_commits,
+            'per_page': per_page,
+            'page': page
+        }
 
-    # Format the date for GitLab API using the format_date_for_gitlab function
-    formatted_since_date = utils.format_date_for_gitlab(since_date)
+        response = requests.get(url, headers=headers, params=params)
 
-    # GitLab API endpoint for listing repository commits
-    url = f"https://gitlab.com/api/v4/projects/{repo_id}/repository/commits"
+        if response.status_code != 200:
+            raise Exception(f"GitLab API Error: {response.status_code} - {response.json().get('message', '')}")
 
-    # Headers including the private token for authentication
-    headers = {
-        'Authorization': f'Bearer {token}'
-    }
+        commits = response.json()
+        if not commits:
+            break
+        all_commits_list.extend(commits)
+        page += 1
 
-    # Parameters for the API request
-    params = {
-        'since': formatted_since_date,
-        'author': author
-    }
-
-    # Sending a GET request to the GitLab API
-    response = requests.get(url, headers=headers, params=params)
-
-    # Handling potential errors
-    if response.status_code != 200:
-        raise Exception(f"GitLab API Error: {response.status_code} - {response.json().get('message', '')}")
-
-    # Return the list of commits
-    return response.json()
+    return all_commits_list
 
 
 def get_commit_changes(repo_id, commit_id, token):
