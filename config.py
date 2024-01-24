@@ -2,7 +2,7 @@ import os
 
 # Configuration for GitLab API
 GITLAB_API_TOKEN = os.getenv('GITLAB_API_TOKEN')
-GITLAB_REPO_IDS = ['20889975', '25568234']
+GITLAB_REPO_IDS = [item.strip() for item in os.getenv('GITLAB_REPO_IDS').split(',')]
 GITLAB_USER = os.getenv('GITLAB_USER')
 GITLAB_BRANCH = 'master'
 DAYS_BACK = 3
