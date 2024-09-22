@@ -4,12 +4,12 @@ import os
 GITLAB_API_TOKEN = os.getenv('GITLAB_API_TOKEN')
 GITLAB_REPO_IDS = [item.strip() for item in os.getenv('GITLAB_REPO_IDS').split(',')]
 GITLAB_USER = os.getenv('GITLAB_USER')
-GITLAB_BRANCH = 'master'
+GITLAB_BRANCH = os.getenv('GITLAB_BRANCH', 'main')
 DAYS_BACK = 3
 
 # Configuration for OpenAI API
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_MODEL = "gpt-3.5-turbo-1106"
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', "gpt-3.5-turbo-1106")
 
 # Configuration for discord
 DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
@@ -20,6 +20,6 @@ USE_DIFF = False
 USE_MESSAGES = True
 WRITE_SUMMARIES = False
 REPOS = {
-    '20889975': 'Server',
-    '25568234': 'Frontend'
+    'your_repo_id': 'your_repo_name',
+    ...
 }
