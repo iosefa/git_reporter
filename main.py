@@ -182,9 +182,15 @@ def format_jira_issues(issues):
 
 def write_report_to_md(report, filename="report.md"):
     """
-    Write the generated report to a markdown (.md) file.
+    Write the generated report to a markdown (.md) file in the reports directory.
     """
-    with open(filename, "w") as file:
+    reports_dir = "reports"
+    if not os.path.exists(reports_dir):
+        os.makedirs(reports_dir)
+
+    filepath = os.path.join(reports_dir, filename)
+
+    with open(filepath, "w") as file:
         file.write(report)
 
 
