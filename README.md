@@ -1,33 +1,37 @@
-# GitLab Reporter
+# Git Reporter
 
-This tool fetches commits from a GitLab repository for a specified branch and duration, generates summary of the fetched commits using OpenAI's API, and posts the summary into a Discord channel or writes it into a file.
+This tool reads and summarizes your git commits and JIRA activity for a project and generates summary using OpenAI's API.
 
 ## Installation
 
 - Clone the repository: `git clone iosefa/gitreporter`
 - Install necessary libraries/packages as mentioned in `requirements.txt` using pip : `pip install -r requirements.txt`
-
-## Required Configuration
-
-Create a `config.py` file in the project's main directory and define the following:
-
-- `GITLAB_API_TOKEN`: GitLab API token.
-- `GITLAB_USER`: GitLab username.
-- `GITLAB_BRANCH`: GitLab repository branch to fetch commits from.
-- `GITLAB_REPO_IDS`: An array of GitLab repository IDs to monitor.
-- `REPOS`: A dictionary mapping repository IDs to repository names.
-- `DAYS_BACK`: Number of days back from the current date to fetch commits.
-- `USE_DIFF`: Set this to True to generate summary on the basis of commit diffs.
-- `USE_MESSAGES`: Set this to True to generate summary on the basis of commit messages.
-- `WRITE_SUMMARIES`: Set this to True to save the summary to a .txt file.
-
-> Note: `USE_DIFF` and `USE_MESSAGES` both can't be True at same time.
+- Set the correct environmental variables by copying the example file with `cp .env-example .env` and filling in the missing values
 
 ## Usage
 
-Once all the above are defined, run your `main.py` script with the command: `python main.py`
+Once all the above are defined, run the main.py script with the following command:
 
-The program will fetch commits from the specified GitLab repositories and generate a summary depending on your configurations. The summary will then be posted to the configured Discord channel or saved to a .txt file as a summary.
+```bash
+python main.py <author> <since> [until] [filename] --git_dir <git_directory>
+```
+
+### Command-Line Arguments:
+
+	•	<author>: The Git author whose commits you want to report on (required).
+	•	<since>: The start date for the report period (in YYYY-MM-DD format, required).
+	•	[until]: The end date for the report period (in YYYY-MM-DD format, optional, defaults to the present day).
+	•	[filename]: The name of the output markdown file where the report will be saved (optional, defaults to report.md).
+
+### Example:
+
+To generate a report for the author “iosefa” from September 1, 2024, to September 30, 2024, and save it as september_report.md, run:
+
+```bash
+python main.py iosefa 2024-09-01 2024-09-30 september_report.md
+```
+
+This will generate a summary of work done for the git user `iosefa` between 2024-09-01 and 2024-09-30 and save it to a file in the git ignored `reports` directory called september_report.md. If you don’t specify an end date (until), the script will use the current date by default.
 
 ## Contributing 
 
