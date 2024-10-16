@@ -42,7 +42,7 @@ def fetch_git_log(author, since, until=None, git_dir='.'):
     Fetch git log for a specific author between a given time period from a local Git repository.
     """
     git_command = [
-        'git', '-C', git_dir, 'log',
+        'git', 'log',
         f'--author={author}',
         f'--since={since}',
         '--all'
@@ -55,10 +55,11 @@ def fetch_git_log(author, since, until=None, git_dir='.'):
 
 
     try:
-        result = subprocess.run(git_command, capture_output=True, text=True, check=True)
-        return result.stdout
+        process = subprocess.Popen(git_command, shell=True, cwd=git_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        return stdout
     except subprocess.CalledProcessError as e:
-        print(f"Error while running git command: {e}")
+        print(f"Error while running git command: {e.stderr}")
         return None
 
 
