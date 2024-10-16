@@ -18,8 +18,6 @@ JIRA_EMAIL = os.getenv('JIRA_EMAIL')
 JIRA_DOMAIN = os.getenv('JIRA_DOMAIN')
 PROJECT_KEY = os.getenv('PROJECT_KEY')
 
-GIT_DIR = "/Users/iosefa/repos/penetrator/where-web"
-
 client = OpenAI(api_key=OPENAI_KEY)
 
 
@@ -53,11 +51,10 @@ def fetch_git_log(author, since, until=None, git_dir='.'):
 
     print(f"Running git command: {' '.join(git_command)}")
 
-
     try:
-        process = subprocess.Popen(git_command, shell=True, cwd=git_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        return stdout
+        result = subprocess.run(git_command, cwd=git_dir, capture_output=True, text=True, check=True)
+        return result.stdout
+
     except subprocess.CalledProcessError as e:
         print(f"Error while running git command: {e.stderr}")
         return None
@@ -203,10 +200,11 @@ if __name__ == "__main__":
     parser.add_argument("until", type=str, nargs="?", default=None,
                         help="End date for the report period (YYYY-MM-DD, optional)")
     parser.add_argument("filename", type=str, nargs="?", default="report.md", help="Filename to save the report as")
+    parser.add_argument("git_dir", type=str, nargs="?", default=".", help="Git directory to summarize commits for")
 
     args = parser.parse_args()
 
-    report = create_detailed_report(args.author, args.since, args.until, GIT_DIR)
+    report = create_detailed_report(args.author, args.since, args.until, args.git_dir)
     write_report_to_md(report, args.filename)
 
     print(f"Report saved to {args.filename}")
